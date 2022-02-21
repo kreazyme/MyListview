@@ -65,13 +65,14 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     TabController controller = TabController(length: 4, vsync: this);
+    final pagecontroler = PageController(initialPage: 1);
     return Scaffold(
       appBar: AppBar(
         actions: [
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8),
-            child:
-                IconButton(onPressed: () {}, icon: const Icon(Icons.search_outlined)),
+            child: IconButton(
+                onPressed: () {}, icon: const Icon(Icons.search_outlined)),
           )
         ],
         title: const Text("My Listview Page"),
@@ -99,29 +100,42 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
         ),
       ),
       drawer: const DrawNavigation(),
-      body: ListView.builder(
-          itemCount: listitem.length,
-          shrinkWrap: true,
-          itemBuilder: (context, index) {
-            return Card(
-              child: ListTile(
-                onTap: () async {
-                  final result =
-                      await Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) => SecondScreen(
-                                number: listitem[index],
-                                index: index,
-                              )));
-                  List<String> ls = result.toString().split("_");
-                  setState(() {
-                    int indet = int.parse(ls[1]);
-                    listitem[indet] = ls[0];
-                  });
-                },
-                title: Text(listitem[index]),
-              ),
-            );
-          }),
+      body: PageView(
+        scrollDirection: Axis.vertical,
+        controller: pagecontroler,                                                                            
+        children: [
+          Container(
+            color: Colors.green,
+            height: double.infinity,
+            width: double.infinity,
+          ),
+          Container(
+            child: ListView.builder(
+                itemCount: listitem.length,
+                shrinkWrap: true,
+                itemBuilder: (context, index) {
+                  return Card(
+                    child: ListTile(
+                      onTap: () async {
+                        final result =
+                            await Navigator.of(context).push(MaterialPageRoute(
+                                builder: (context) => SecondScreen(
+                                      number: listitem[index],
+                                      index: index,
+                                    )));
+                        List<String> ls = result.toString().split("_");
+                        setState(() {
+                          int indet = int.parse(ls[1]);
+                          listitem[indet] = ls[0];
+                        });
+                      },
+                      title: Text(listitem[index]),
+                    ),
+                  );
+                }),
+          )
+        ],
+      ),
       floatingActionButton: Stack(
         children: <Widget>[
           Align(
@@ -143,6 +157,7 @@ class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
               padding: const EdgeInsets.all(12),
               child: FloatingActionButton(
                 onPressed: () {
+                  print(controller.index.toString());
                   addListItem();
                 },
                 child: const Icon(Icons.add),
